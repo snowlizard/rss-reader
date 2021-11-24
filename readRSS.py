@@ -26,4 +26,4 @@ class ReadRSS:
         content to the screen.'''
         title = self.soup.find(string=t)
         parent = title.findParent("title").findParent("item")
-        return parent.get_text()
+        return parent.prettify()
