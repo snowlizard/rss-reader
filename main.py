@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWebEngineWidgets import *
 from readRSS import ReadRSS
 
 class Ui_MainWindow(object):
@@ -48,6 +49,9 @@ class Ui_MainWindow(object):
         self.menuAbout.addAction(self.actionHelp)
         self.menubar.addAction(self.menuAbout.menuAction())
 
+        # feed data
+        self.data = data
+
         # tree view
         self.model = QtGui.QStandardItemModel()
         self.model.setHorizontalHeaderLabels(["Feeds"])
@@ -59,13 +63,18 @@ class Ui_MainWindow(object):
         self.actionAbout.triggered.connect(self.about)
         self.actionHelp.triggered.connect(self.help)
 
+        # feed browser
+        self.browser = QWebEngineView(self.centralwidget)
+        self.browser.setGeometry(QtCore.QRect(300, 30, 561, 541))
+        self.browser.setUrl(QtCore.QUrl("author.jpg"))
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButton.setText(_translate("MainWindow", "PushButton"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "RSS Reader"))
+        self.pushButton.setText(_translate("MainWindow", "Add Feed"))
         self.menuAbout.setTitle(_translate("MainWindow", "Help"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionHelp.setText(_translate("MainWindow", "Help"))
@@ -90,7 +99,15 @@ class Ui_MainWindow(object):
     
     def loadContent(self):
         index = QtCore.QModelIndex(self.treeView.currentIndex())
-        print(index.data())
+        title = index.data()
+        key = index.parent().data()
+        for items in self.data:
+            for iKey in items:
+                if iKey == key:
+                    rss = ReadRSS(items[iKey])
+                    contents = rss.getContent(title)
+                    self.browser.page().setHtml(contents)
+                    self.browser.show()
 
     def about(self):
         '''Message box for about tab'''
