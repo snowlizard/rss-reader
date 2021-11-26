@@ -8,10 +8,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWebEngineWidgets import *
 from readRSS import ReadRSS
 from dialogA import AddFeedDialog
+from menubar import MenuBar
 
 class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow, data):
@@ -39,23 +40,8 @@ class Ui_MainWindow(QMainWindow):
         self.line.setObjectName("line")
 
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 890, 22))
-        self.menubar.setObjectName("menubar")
-        self.menuAbout = QtWidgets.QMenu(self.menubar)
-        self.menuAbout.setObjectName("menuAbout")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
-        self.actionAbout = QtWidgets.QAction(MainWindow)
-        self.actionAbout.setObjectName("actionAbout")
-        self.actionHelp = QtWidgets.QAction(MainWindow)
-        self.actionHelp.setObjectName("actionHelp")
-        self.menuAbout.addAction(self.actionAbout)
-        self.menuAbout.addSeparator()
-        self.menuAbout.addAction(self.actionHelp)
-        self.menubar.addAction(self.menuAbout.menuAction())
+        self.menuBar = MenuBar(parent=MainWindow)
+        MainWindow.setMenuBar(self.menuBar)
 
         # feed data
         self.data = data
@@ -66,10 +52,6 @@ class Ui_MainWindow(QMainWindow):
         self.treeView.setModel(self.model)
         self.importData(data)
         self.treeView.clicked.connect(self.loadContent)
-
-        # Connect Menu actions
-        self.actionAbout.triggered.connect(self.about)
-        self.actionHelp.triggered.connect(self.help)
 
         # feed browser
         self.browser = QWebEngineView(self.centralwidget)
@@ -87,9 +69,6 @@ class Ui_MainWindow(QMainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "RSS Reader"))
         self.addButton.setText(_translate("MainWindow", "Add Feed"))
         self.delButton.setText(_translate("MainWindow", "Remove Feed"))
-        self.menuAbout.setTitle(_translate("MainWindow", "Help"))
-        self.actionAbout.setText(_translate("MainWindow", "About"))
-        self.actionHelp.setText(_translate("MainWindow", "Help"))
 
     def importData(self, data):
         '''Add feed keys and titles'''
@@ -120,28 +99,6 @@ class Ui_MainWindow(QMainWindow):
                     contents = rss.getContent(title)
                     self.browser.page().setHtml(contents)
                     self.browser.show()
-
-    def about(self):
-        '''Message box for about tab'''
-        msg = QMessageBox()
-        msg.setWindowTitle("About")
-        msg.setText("RSS Reader is a simple rss reader\n"
-                    "created by Julian Gonzalez.")
-        img = QtGui.QPixmap("author.jpg")
-        msg.setIconPixmap(img.scaled(QtCore.QSize(150,150), 
-                          transformMode=QtCore.Qt.SmoothTransformation))
-
-        runMsg = msg.exec_()
-
-    def help(self):
-        '''Message box for help tab'''
-        msg = QMessageBox()
-        msg.setWindowTitle("RSS Reader Help")
-        msg.setIcon(QMessageBox.Question)
-        msg.setText("Select an rss feed from the list on the left\n"
-                    "and the view on the right will display that feed")
-
-        runMsg = msg.exec_()
 
     def addFeed(self):
         dialog = QtWidgets.QDialog()
