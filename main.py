@@ -8,28 +8,36 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5.QtWebEngineWidgets import *
 from readRSS import ReadRSS
+from dialogA import AddFeedDialog
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow, data):
         MainWindow.setObjectName("Rss Reader")
         MainWindow.resize(890, 591)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.treeView = QtWidgets.QTreeView(self.centralwidget)
         self.treeView.setGeometry(QtCore.QRect(10, 20, 221, 471))
         self.treeView.setObjectName("listView")
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(10, 500, 221, 41))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.text = "Add Feed"
+
+        self.addButton = QtWidgets.QPushButton(self.centralwidget)
+        self.addButton.setGeometry(QtCore.QRect(10, 500, 101, 41))
+        self.addButton.setObjectName("pushButton")
+
+        self.delButton = QtWidgets.QPushButton(self.centralwidget)
+        self.delButton.setGeometry(QtCore.QRect(120, 500, 111, 41))
+        self.delButton.setObjectName("pushButton_2")
+
         self.line = QtWidgets.QFrame(self.centralwidget)
         self.line.setGeometry(QtCore.QRect(260, 30, 20, 471))
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 890, 22))
@@ -68,20 +76,24 @@ class Ui_MainWindow(object):
         self.browser.setGeometry(QtCore.QRect(300, 30, 561, 541))
         self.browser.setUrl(QtCore.QUrl("author.jpg"))
 
+        # Button actions
+        self.addButton.clicked.connect(self.addFeed)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "RSS Reader"))
-        self.pushButton.setText(_translate("MainWindow", "Add Feed"))
+        self.addButton.setText(_translate("MainWindow", "Add Feed"))
+        self.delButton.setText(_translate("MainWindow", "Remove Feed"))
         self.menuAbout.setTitle(_translate("MainWindow", "Help"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
         self.actionHelp.setText(_translate("MainWindow", "Help"))
 
     def importData(self, data):
         '''Add feed keys and titles'''
-        root = self.model.invisibleRootItem()
+        self.root = self.model.invisibleRootItem()
         for item in data:
             for key in item:
                 parent = QtGui.QStandardItem(key)
@@ -91,7 +103,7 @@ class Ui_MainWindow(object):
                     t = QtGui.QStandardItem(title)
                     t.setEditable(False)
                     parent.appendRow(t)
-                root.appendRow(parent)         
+                self.root.appendRow(parent)         
 
     def addTitles(self, url):
         reader = ReadRSS(url)
@@ -131,6 +143,22 @@ class Ui_MainWindow(object):
 
         runMsg = msg.exec_()
 
+    def addFeed(self):
+        dialog = QtWidgets.QDialog()
+        window = AddFeedDialog()
+        window.setupUi(dialog)
+        dialog.show()
+        
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.data.append(window.value)
+            key = list(window.value.keys())[0]
+            if key != "" or window.value[key] != "":
+                rss = ReadRSS(window.value[key])
+                parent = QtGui.QStandardItem(key)
+                for title in rss.getTitles():
+                    t = QtGui.QStandardItem(title)
+                    parent.appendRow(t)
+                self.root.appendRow(parent)
 
 if __name__ == "__main__":
     import sys
