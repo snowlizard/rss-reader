@@ -6,12 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWebEngineWidgets import *
-from readRSS import ReadRSS
-from dialogA import AddFeedDialog
+from dataTree import FeedView
 from menubar import MenuBar
 
 class Ui_MainWindow(QMainWindow):
@@ -21,9 +19,9 @@ class Ui_MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.treeView = QtWidgets.QTreeView(self.centralwidget)
-        self.treeView.setGeometry(QtCore.QRect(10, 20, 221, 471))
-        self.treeView.setObjectName("listView")
+        # feed data
+        self.data = data
+        self.treeView = FeedView(parent=self.centralwidget, data=self.data)
 
         self.addButton = QtWidgets.QPushButton(self.centralwidget)
         self.addButton.setGeometry(QtCore.QRect(10, 500, 101, 41))
@@ -43,23 +41,15 @@ class Ui_MainWindow(QMainWindow):
         self.menuBar = MenuBar(parent=MainWindow)
         MainWindow.setMenuBar(self.menuBar)
 
-        # feed data
-        self.data = data
-
-        # tree view
-        self.model = QtGui.QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(["Feeds"])
-        self.treeView.setModel(self.model)
-        self.importData(data)
-        self.treeView.clicked.connect(self.loadContent)
-
         # feed browser
         self.browser = QWebEngineView(self.centralwidget)
         self.browser.setGeometry(QtCore.QRect(300, 30, 561, 541))
         self.browser.setUrl(QtCore.QUrl("author.jpg"))
 
-        # Button actions
-        self.addButton.clicked.connect(self.addFeed)
+        # actions
+        self.treeView.clicked.connect(self.loadFeed)
+        self.addButton.clicked.connect(self.treeView.addFeed)
+        # self.delButton.clicked.connecet()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -69,53 +59,11 @@ class Ui_MainWindow(QMainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "RSS Reader"))
         self.addButton.setText(_translate("MainWindow", "Add Feed"))
         self.delButton.setText(_translate("MainWindow", "Remove Feed"))
-
-    def importData(self, data):
-        '''Add feed keys and titles'''
-        self.root = self.model.invisibleRootItem()
-        for item in data:
-            for key in item:
-                parent = QtGui.QStandardItem(key)
-                parent.setEditable(False)
-                titles = self.addTitles(item[key])
-                for title in titles:
-                    t = QtGui.QStandardItem(title)
-                    t.setEditable(False)
-                    parent.appendRow(t)
-                self.root.appendRow(parent)         
-
-    def addTitles(self, url):
-        reader = ReadRSS(url)
-        return reader.getTitles()
     
-    def loadContent(self):
-        index = QtCore.QModelIndex(self.treeView.currentIndex())
-        title = index.data()
-        key = index.parent().data()
-        for items in self.data:
-            for iKey in items:
-                if iKey == key:
-                    rss = ReadRSS(items[iKey])
-                    contents = rss.getContent(title)
-                    self.browser.page().setHtml(contents)
-                    self.browser.show()
-
-    def addFeed(self):
-        dialog = QtWidgets.QDialog()
-        window = AddFeedDialog()
-        window.setupUi(dialog)
-        dialog.show()
-        
-        if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.data.append(window.value)
-            key = list(window.value.keys())[0]
-            if key != "" or window.value[key] != "":
-                rss = ReadRSS(window.value[key])
-                parent = QtGui.QStandardItem(key)
-                for title in rss.getTitles():
-                    t = QtGui.QStandardItem(title)
-                    parent.appendRow(t)
-                self.root.appendRow(parent)
+    def loadFeed(self):
+        content = self.treeView.loadContent()
+        self.browser.page().setHtml(content)
+        self.browser.show()
 
 if __name__ == "__main__":
     import sys
