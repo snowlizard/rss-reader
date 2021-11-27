@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QTreeView
 from dialogA import AddFeedDialog
 from readRSS import ReadRSS
+import json
 
 class FeedView(QTreeView):
     def __init__(self, parent=None, data=[]) -> None:
@@ -60,6 +61,9 @@ class FeedView(QTreeView):
             self.data.append(window.value)
             key = list(window.value.keys())[0]
             if key != "" or window.value[key] != "":
+                f = open("data.json", "w+")
+                json.dump(self.data, f)
+                f.close()
                 rss = ReadRSS(window.value[key])
                 parent = QtGui.QStandardItem(key)
                 for title in rss.getTitles():
@@ -75,6 +79,9 @@ class FeedView(QTreeView):
         for item in self.data:
             if list(item.keys())[0] == key:
                 self.data.remove(item)
+                f = open("data.json", "w+")
+                json.dump(self.data, f)
+                f.close()
                 if self.confirmDeletion(index.data()) == QMessageBox.Yes:
                     self.root.removeRow(index.row())
 

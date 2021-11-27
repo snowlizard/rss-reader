@@ -6,11 +6,12 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWebEngineWidgets import *
 from dataTree import FeedView
 from menubar import MenuBar
+import json
 
 class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow, data):
@@ -68,16 +69,13 @@ class Ui_MainWindow(QMainWindow):
 if __name__ == "__main__":
     import sys
 
-    feeds = [
-    {"ars index": 'https://feeds.arstechnica.com/arstechnica/index'},
-    {"ars features": 'https://feeds.arstechnica.com/arstechnica/features'},
-    {"ars tech": 'https://feeds.arstechnica.com/arstechnica/technology-lab'},
-    {"ltt programming": 'https://linustechtips.com/forum/20-programming.xml/'}
-    ]
+    ofile = open("data.json")
+    newFeed = json.load(ofile)
+    ofile.close()
 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
-    ui.setupUi(MainWindow, feeds)
+    ui.setupUi(MainWindow, newFeed)
     MainWindow.show()
     sys.exit(app.exec_())
