@@ -49,7 +49,7 @@ class Ui_MainWindow(QMainWindow):
         # actions
         self.treeView.clicked.connect(self.loadFeed)
         self.addButton.clicked.connect(self.treeView.addFeed)
-        # self.delButton.clicked.connecet()
+        self.delButton.clicked.connect(self.treeView.removeFeed)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)

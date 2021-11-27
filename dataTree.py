@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTreeView
+from PyQt5.QtWidgets import QDialogButtonBox, QLabel, QMessageBox, QTreeView
 from dialogA import AddFeedDialog
 from readRSS import ReadRSS
 
@@ -12,13 +12,13 @@ class FeedView(QTreeView):
         self.model = QtGui.QStandardItemModel()
         self.model.setHorizontalHeaderLabels(["Feeds"])
         self.setModel(self.model)
-        
+        self.root = self.model.invisibleRootItem()
+
         self.data = data
         self.importData()
 
     def importData(self):
         '''Add feed keys and titles'''
-        self.root = self.model.invisibleRootItem()
         for item in self.data:
             for key in item:
                 parent = QtGui.QStandardItem(key)
@@ -35,6 +35,9 @@ class FeedView(QTreeView):
         return reader.getTitles()
     
     def loadContent(self):
+        '''match current index with title and
+        retrieve and return html data'''
+        contents = ""
         index = QtCore.QModelIndex(self.currentIndex())
         title = index.data()
         key = index.parent().data()
@@ -46,6 +49,8 @@ class FeedView(QTreeView):
         return contents
 
     def addFeed(self):
+        '''Adds feed from user input
+        append to self.data as dictionary'''
         dialog = QtWidgets.QDialog()
         window = AddFeedDialog()
         window.setupUi(dialog)
@@ -61,3 +66,19 @@ class FeedView(QTreeView):
                     t = QtGui.QStandardItem(title)
                     parent.appendRow(t)
                 self.root.appendRow(parent)
+    
+    def removeFeed(self):
+        '''check if index equal to a key
+        if it is remove from tree and data'''
+        index = QtCore.QModelIndex(self.currentIndex())
+        key = index.data()
+        for item in self.data:
+            if list(item.keys())[0] == key:
+                self.data.remove(item)
+                if self.confirmDeletion(index.data()) == QMessageBox.Yes:
+                    self.root.removeRow(index.row())
+
+    def confirmDeletion(self, feedName):
+        window = QMessageBox().question(self, "", f"Are you sure you want to delete this feed?\n {feedName}",
+                                        QMessageBox.Yes | QMessageBox.No)
+        return window
