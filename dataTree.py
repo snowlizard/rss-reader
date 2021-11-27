@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialogButtonBox, QLabel, QMessageBox, QTreeView
+from PyQt5.QtWidgets import QMessageBox, QTreeView
 from dialogA import AddFeedDialog
 from readRSS import ReadRSS
 
