@@ -9,9 +9,7 @@ along with a custom key name.
 There are 5 components total each with their own
 class. Most of the work is done from readRSS.py
 and dataTree.py. 
-
-===
-
+---
 ## Setup for editing project
 create a virtual environment using python3
 and activate.
@@ -22,5 +20,4 @@ and activate.
 `[environment-name]\Scripts\activate.bat`
 Install python3 requirements using pip
 `pip install -r requirments.txt`
-
-===
+---
