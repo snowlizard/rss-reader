@@ -52,24 +52,8 @@ class FeedView(QTreeView):
     def addFeed(self):
         '''Adds feed from user input
         append to self.data as dictionary'''
-        dialog = QtWidgets.QDialog()
-        window = AddFeedDialog()
-        window.setupUi(dialog)
+        dialog = AddFeedDialog()
         dialog.show()
-        
-        if dialog.exec_() == QtWidgets.QDialog.Accepted:
-            self.data.append(window.value)
-            key = list(window.value.keys())[0]
-            if key != "" or window.value[key] != "":
-                f = open("data.json", "w+")
-                json.dump(self.data, f)
-                f.close()
-                rss = ReadRSS(window.value[key])
-                parent = QtGui.QStandardItem(key)
-                for title in rss.getTitles():
-                    t = QtGui.QStandardItem(title)
-                    parent.appendRow(t)
-                self.root.appendRow(parent)
     
     def removeFeed(self):
         '''check if index equal to a key
