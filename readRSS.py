@@ -8,8 +8,8 @@ class ReadRSS:
     def __init__(self, url) -> None:
         '''Initializes class returns None'''
         self.url = url
-        page = requests.get(url)
-        self.soup = BeautifulSoup(page.content, "html5lib",
+        self.page = requests.get(url)
+        self.soup = BeautifulSoup(self.page.content, "html5lib",
                                   from_encoding="utf-8")
 
     def getTitles(self):
@@ -19,6 +19,7 @@ class ReadRSS:
         titles = self.soup.find_all("title")
         for i in range(2, len(titles)):
             temp.append(titles[i].text)
+        self.page.close()
         return temp
 
     def getContent(self, t):
@@ -26,4 +27,5 @@ class ReadRSS:
         content to the screen.'''
         title = self.soup.find(string=t)
         parent = title.findParent("title").findParent("item")
+        self.page.close()
         return parent.prettify()
