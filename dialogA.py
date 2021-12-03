@@ -40,7 +40,7 @@ class AddFeedDialog(QDialog):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         # button events
-        self.addBtn.clicked.connect(lambda: self.setValueDict(self))
+        self.addBtn.clicked.connect(lambda: self.setValueDict())
         self.cancelBtn.clicked.connect(self.reject)
 
     def retranslateUi(self):
