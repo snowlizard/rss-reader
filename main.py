@@ -6,6 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import sys
+
+sys.path.insert(1, './src')
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWebEngineWidgets import *
@@ -69,7 +73,7 @@ class Ui_MainWindow(QMainWindow):
 if __name__ == "__main__":
     import sys
 
-    ofile = open("data.json")
+    ofile = open("./src/data.json")
     newFeed = json.load(ofile)
     ofile.close()
 
