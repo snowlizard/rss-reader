@@ -21,4 +21,3 @@ and activate.
 Install python3 requirements using pip
 `pip install -r requirments.txt`
 ---
-Under the dist directory there is an executable file to run the application
